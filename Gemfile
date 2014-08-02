@@ -15,7 +15,7 @@ gem 'faker'
 
 group :development do
   gem 'sqlite3'
-  
+  gem 'letter_opener'
   gem 'pry-nav'
   gem 'thin'
   gem "better_errors"
