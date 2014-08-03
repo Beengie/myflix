@@ -8,6 +8,10 @@ describe User do
   it {should have_many(:queue_items).order("position")}
   it {should have_many(:reviews).order("created_at DESC")}
 
+  it_behaves_like "tokenable" do
+    let(:object) {Fabricate(:user)}
+  end
+
   it "generates a random token when the user is created" do
     lalaine = Fabricate(:user)
     expect(lalaine.token).to be_present
@@ -39,6 +43,20 @@ describe User do
       bob = Fabricate(:user)
       relationship = Fabricate(:relationship, follower: lalaine, leader: bob)
       expect(bob.follows?(lalaine)).to be_false
+    end
+  end
+
+  describe "#follow" do
+    it "follows another user" do
+      lalaine = Fabricate(:user)
+      joe = Fabricate(:user)
+      lalaine.follow(joe)
+      expect(lalaine.follows?(joe)).to be_true
+    end
+    it "does not follow one self" do
+      lalaine = Fabricate(:user)
+      lalaine.follow(lalaine)
+      expect(lalaine.follows?(lalaine)).to be_false
     end
   end
 end
