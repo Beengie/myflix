@@ -21,6 +21,28 @@ describe UsersController do
     end
   end
 
+  describe "GET new_with_invitation_token" do
+    it "renders the :new view template" do
+      invitation = Fabricate(:invitation)
+      get :new_with_invitation_token, token: invitation.token
+      expect(response).to render_template(:new)
+    end
+    it "sets @user with recipient's email" do
+      invitation = Fabricate(:invitation)
+      get :new_with_invitation_token, token: invitation.token
+      expect(assigns(:user).email).to eq(invitation.recipient_email)
+    end
+    it "sets @invitation_token" do
+      invitation = Fabricate(:invitation)
+      get :new_with_invitation_token, token: invitation.token
+      expect(assigns(:invitation_token)).to eq(invitation.token)
+    end
+    it "redirects to the expired token page for invalid tokens" do
+      get :new_with_invitation_token, token: "dkfh"
+      expect(response).to redirect_to expired_token_path
+    end
+  end
+
   describe "POST create" do
     context "with valid input" do
       before do
@@ -33,6 +55,28 @@ describe UsersController do
 
       it "redirects the user to the sign in page" do
         expect(response).to redirect_to(:sign_in)
+      end
+
+      it "makes the user follow the inviter" do
+        lalaine = Fabricate(:user)
+        invitation = Fabricate(:invitation, inviter: lalaine, recipient_email: "joe@example.com")
+        post :create, user: {email: "joe@example.com", password: "password", username: "Joe Doe"}, invitation_token: invitation.token
+        joe = User.where(email: "joe@example.com").first
+        expect(joe.follows?(lalaine)).to be_true
+      end
+      it "makes the inviter follow the user" do
+        lalaine = Fabricate(:user)
+        invitation = Fabricate(:invitation, inviter: lalaine, recipient_email: "joe@example.com")
+        post :create, user: {email: "joe@example.com", password: "password", username: "Joe Doe"}, invitation_token: invitation.token
+        joe = User.where(email: "joe@example.com").first
+        expect(lalaine.follows?(joe)).to be_true
+      end
+      it "expires the invitaion upon acceptance" do
+        lalaine = Fabricate(:user)
+        invitation = Fabricate(:invitation, inviter: lalaine, recipient_email: "joe@example.com")
+        post :create, user: {email: "joe@example.com", password: "password", username: "Joe Doe"}, invitation_token: invitation.token
+        joe = User.where(email: "joe@example.com").first
+        expect(Invitation.first.token).to be_nil
       end
     end
 

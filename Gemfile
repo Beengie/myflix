@@ -30,8 +30,9 @@ end
 
 group :test do
   gem 'shoulda-matchers'
-  gem 'capybara'
+  gem 'capybara', '~>2.4'
   gem 'launchy'
+  gem 'capybara-email', github: "dockyard/capybara-email"
 end
 
 group :production do
