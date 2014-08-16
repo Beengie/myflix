@@ -12,6 +12,7 @@ gem 'bootstrap_form', :git => "git://github.com/bootstrap-ruby/rails-bootstrap-f
 gem 'bcrypt-ruby'
 gem 'fabrication'
 gem 'faker'
+gem 'unicorn'
 
 group :development do
   gem 'sqlite3'
@@ -38,6 +39,5 @@ end
 group :production do
   gem 'pg'
   gem 'rails_12factor'
-  gem 'unicorn'
 end
 
