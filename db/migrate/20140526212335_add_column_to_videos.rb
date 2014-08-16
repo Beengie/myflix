@@ -1,5 +1,5 @@
 class AddColumnToVideos < ActiveRecord::Migration
   def change
-    add_column :Videos, :rating, :integer
+    add_column :videos, :rating, :integer
   end
 end
